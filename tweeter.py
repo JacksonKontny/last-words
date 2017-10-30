@@ -1,6 +1,11 @@
 import tweepy
 import configparser
 import reader
+import os
+
+
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+
 
 def get_api(cfg):
   auth = tweepy.OAuthHandler(cfg['consumer_key'], cfg['consumer_secret'])
@@ -10,7 +15,7 @@ def get_api(cfg):
 def main():
   # Fill in the values noted in previous step here
   config_parser = configparser.ConfigParser()
-  config_parser.read('config.ini')
+  config_parser.read(os.path.join(DIR_PATH, 'config.ini'))
   cfg = config_parser['last-words']
 
 

@@ -2,6 +2,13 @@ from csv import DictReader
 import csv
 import random
 
+
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+DATA_PATH = os.path.join(DIR_PATH, 'data')
+LAST_WORDS_PATH = os.path.join(DATA_PATH, 'lastwords.csv')
+LAST_WORDS_CLEANED_PATH = os.path.join(DATA_PATH, 'lastwords_cleaned.csv')
+
+
 def utf_8_encoder(unicode_csv_data):
     for line in unicode_csv_data:
         yield line.decode('utf-8')
@@ -16,13 +23,15 @@ def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
 
 
 def clean():
-    with open('./data/lastwords.csv') as data_file:
+    with open(LAST_WORDS_PATH) as data_file:
         reader = DictReader(data_file)
-        x = [r for r in reader if r['words'] != 'This offender declined to make a last statement.']
-        with open('./data/lastwords_cleaned.csv', 'w+') as cleaned_data_file:
+        valid_statements = [
+            r for r in reader if r['words'] != 'This offender declined to make a last statement.'
+        ]
+        with open(LAST_WORDS_CLEANED_PATH) as cleaned_data_file:
             writer = csv.DictWriter(cleaned_data_file, fieldnames=reader.fieldnames)
             writer.writeheader()
-            writer.writerows(x)
+            writer.writerows(valid_statements)
 
 def get_formatted_entries(entry):
     full_text = 'Death row quote of the day:\n{} {}, Age: {}\n\n{}'.format(
@@ -32,10 +41,10 @@ def get_formatted_entries(entry):
         entry['words']
     )
     scanner = Scanner(full_text)
-    return [x for x in scanner]
+    return [line for line in scanner]
 
 def get_tweets():
-    with open('./data/lastwords_cleaned.csv') as data_file:
+    with open(LAST_WORDS_CLEANED_PATH) as data_file:
         entry_idx = random.randint(1, 405)
         reader = DictReader(data_file)
         for idx, entry in enumerate(reader):
